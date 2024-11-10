@@ -1,9 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { Suspense } from 'react'; // Import Suspense
-
+import { useRouter, useSearchParams } from 'next/navigation'; // Correctly using the hook
 import Form from '@components/Form';
 
 const EditPrompt = () => {
@@ -16,18 +14,33 @@ const EditPrompt = () => {
     prompt: '',
     tag: '',
   });
-  
+  const [loading, setLoading] = useState(true); // Adding a loading state
+
+  // Fetch prompt details when the promptId changes
   useEffect(() => {
     const getPromptDetails = async () => {
-      const response = await fetch(`/api/prompt/${promptId}`);
-      const data = await response.json();
-      setPost({
-        prompt: data.prompt,
-        tag: data.tag,
-      });
+      if (!promptId) {
+        return; // Exit early if there's no promptId
+      }
+      
+      try {
+        setLoading(true); // Set loading to true while fetching data
+        const response = await fetch(`/api/prompt/${promptId}`);
+        const data = await response.json();
+        setPost({
+          prompt: data.prompt,
+          tag: data.tag,
+        });
+      } catch (error) {
+        console.error("Error fetching prompt:", error);
+      } finally {
+        setLoading(false); // Set loading to false once data is fetched
+      }
     };
-    
-    if (promptId) getPromptDetails();
+
+    if (promptId) {
+      getPromptDetails(); // Fetch prompt details when the component is mounted or promptId changes
+    }
   }, [promptId]);
 
   const updatePrompt = async (e) => {
@@ -44,7 +57,7 @@ const EditPrompt = () => {
           tag: post.tag,
         }),
         headers: {
-          'Content-Type': 'application/json', // Ensure JSON content-type header
+          'Content-Type': 'application/json', // Make sure content type is set to JSON
         },
       });
 
@@ -54,23 +67,24 @@ const EditPrompt = () => {
         alert('Failed to update prompt');
       }
     } catch (error) {
-      console.log(error);
+      console.error("Error updating prompt:", error);
     } finally {
       setSubmitting(false);
     }
   };
 
-  // Suspense Boundary added to handle async operations properly
+  if (loading) {
+    return <div>Loading...</div>; // Show loading UI while fetching
+  }
+
   return (
-    <Suspense fallback={<div>Loading...</div>}> 
-      <Form
-        type="Edit"
-        post={post}
-        setPost={setPost}
-        submitting={submitting}
-        handleSubmit={updatePrompt}
-      />
-    </Suspense>
+    <Form
+      type="Edit"
+      post={post}
+      setPost={setPost}
+      submitting={submitting}
+      handleSubmit={updatePrompt}
+    />
   );
 };
 
