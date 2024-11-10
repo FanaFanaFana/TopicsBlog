@@ -2,6 +2,7 @@
 
 import {useEffect, useState} from 'react'
 import {useRouter, useSearchParams} from 'next/navigation';
+import { Suspense } from 'react';
 
 import Form from '@components/Form';
 
@@ -14,6 +15,8 @@ const EditPrompt = () => {
         prompt: '',
         tag: '',
     });
+
+    
 
     useEffect(() => {
         const getPromptDetails = async () => {
@@ -68,6 +71,10 @@ const response = await fetch(`/api/prompt/${promptId}`, {
     />
   )
 }
+
+<Suspense fallback={<div>Loading...</div>}>
+  <EditPrompt />
+</Suspense>
 
 
 export default EditPrompt
