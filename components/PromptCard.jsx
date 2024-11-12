@@ -28,7 +28,7 @@ const PromptCard = ({ post, handleTagClick, handleEdit, handleDelete }) => {
 					/>
 					<div className='flex flex-col'>
 						<a
-							href={`https://promptopia-blush-eight.vercel.app/profile/${post.creator._id}?name=${post.creator.username}`}
+							href={`https://website-react-git-main-fanafanafanas-projects.vercel.app/${post.creator._id}?name=${post.creator.username}`}
 							className='font-satoshi font-semibold text-gray-900'>
 							{post.creator.username}
 						</a>
