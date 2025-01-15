@@ -29,14 +29,7 @@ const Comment = ({ comment, onReply, session }) => {
         </strong>
         : {comment.text}
       </p>
-      {session && (
-        <button
-          onClick={() => setShowReplyForm((prev) => !prev)}
-          className="text-sm text-gray-500 hover:text-gray-800"
-        >
-          {showReplyForm ? 'Cancel' : 'Reply'}
-        </button>
-      )}
+      
       {showReplyForm && (
         <form className="mt-2" onSubmit={handleReplySubmit}>
           <input
@@ -54,6 +47,7 @@ const Comment = ({ comment, onReply, session }) => {
           </button>
         </form>
       )}
+
       {comment.replies?.map((reply) => (
         <Comment
           key={reply._id}
@@ -62,6 +56,16 @@ const Comment = ({ comment, onReply, session }) => {
           session={session}
         />
       ))}
+      
+      {/* Reply/Cancel button */}
+      {session && !showReplyForm && (
+        <button
+          onClick={() => setShowReplyForm((prev) => !prev)}
+          className="text-sm text-gray-500 hover:text-gray-800 mt-2"
+        >
+          {showReplyForm ? 'Cancel' : 'Reply'}
+        </button>
+      )}
     </div>
   );
 };
@@ -201,9 +205,9 @@ const PromptCard = ({ post, handleTagClick, handleEdit, handleDelete }) => {
             <p className="font-inter text-sm text-gray-500">{post.creator.email}</p>
           </div>
         </div>
-        <div className="text-sm text-gray-500 absolute right-5 top-5">{formattedDate}</div> {/* Adjusted the position */}
+        <div className="text-sm text-gray-500 absolute right-5 top-5">{formattedDate}</div>
       </div>
-      <p className="my-4 font-satoshi text-sm text-gray-700">{post.prompt}</p>
+      <p className="my-4 font-satoshi text-l text-gray-900">{post.prompt}</p>
       <p
         className="font-inter text-sm blue_gradient cursor-pointer"
         onClick={() => handleTagClick && handleTagClick(post.tag)}
@@ -272,6 +276,27 @@ const PromptCard = ({ post, handleTagClick, handleEdit, handleDelete }) => {
           </form>
         )}
       </div>
+
+      {/* Edit and Delete buttons (only visible on profile page) */}
+      {session?.user.id === post.creator._id && pathName.startsWith('/profile') && (
+  <div className="absolute top-10 right-3">
+    <button
+      onClick={() => handleEdit(post)} // Ensure this opens an edit form or modal
+      className="bg-blue-400 text-white px-4 py-2 rounded-md mr-2"
+    >
+      Edit
+    </button>
+    <button
+      onClick={() => {
+        const confirmDelete = window.confirm('Are you sure you want to delete this post?');
+        if (confirmDelete) handleDelete(post);
+      }}
+      className="bg-red-400 text-white px-4 py-2 rounded-md"
+    >
+      Delete
+    </button>
+  </div>
+)}
     </div>
   );
 };
